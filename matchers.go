@@ -138,7 +138,9 @@ func (mm *returnZeroMatcher) Match(val *value) bool {
 	var val1, val2 value
 	var number float64
 	var varName string
-	return bin(any(&val1), "*", num(0))(val) || bin(num(0), "*", any(&val2))(val) || (anyVariable(&number, &varName)(val) && number == 0.0)
+	return bin(any(&val1), "*", num(0))(val) ||
+		bin(num(0), "*", any(&val2))(val) ||
+		(anyVariable(&number, &varName)(val) && number == 0.0)
 }
 
 func (mm *returnZeroMatcher) Execute() value {
@@ -187,110 +189,96 @@ func (am *variableAddMatcher) Execute() value {
 	return Var(am.number1+am.number2, am.varName1)
 }
 
-type variableAndNumberMulMatcher struct {
-	number1, number2 float64
-	varName          string
-}
-
-func (mm *variableAndNumberMulMatcher) Match(val *value) bool {
-	return bin(anyVariable(&mm.number1, &mm.varName), "*", anyNum(&mm.number2))(val) ||
-		bin(anyNum(&mm.number1), "*", anyVariable(&mm.number2, &mm.varName))(val)
-}
-
-func (mm *variableAndNumberMulMatcher) Execute() value {
-	return Var(mm.number1*mm.number2, mm.varName)
-}
-
-type distributivMatcher struct {
+type distributiveMatcher struct {
 	val1, val2 value
 	number     float64
 }
 
-func (dm *distributivMatcher) Match(val *value) bool {
+func (dm *distributiveMatcher) Match(val *value) bool {
 	return bin(bin(any(&dm.val1), "+", any(&dm.val2)), "*", anyNum(&dm.number))(val) ||
 		bin(anyNum(&dm.number), "*", bin(any(&dm.val1), "+", any(&dm.val2)))(val)
 }
 
-func (dm *distributivMatcher) Execute() value {
+func (dm *distributiveMatcher) Execute() value {
 	return Add(Mul(Num(dm.number), dm.val1), Mul(Num(dm.number), dm.val2))
 }
 
-type assoziativMatcher1 struct {
+type associativeMatcher1 struct {
 	number1, number2, number3 float64
 	varName1, varName2        string
 }
 
-func (am *assoziativMatcher1) Match(val *value) bool {
+func (am *associativeMatcher1) Match(val *value) bool {
 	return bin(bin(anyVariable(&am.number1, &am.varName1), "+", anyNum(&am.number2)), "+", anyVariable(&am.number3, &am.varName2))(val)
 }
 
-func (am *assoziativMatcher1) Execute() value {
+func (am *associativeMatcher1) Execute() value {
 	return Add(Var(am.number1+am.number3, am.varName1), Num(am.number2))
 }
 
-type assoziativMatcher2 struct {
+type associativeMatcher2 struct {
 	number1, number2 float64
 	v                value
 }
 
-func (am *assoziativMatcher2) Match(val *value) bool {
+func (am *associativeMatcher2) Match(val *value) bool {
 	return bin(bin(any(&am.v), "+", anyNum(&am.number1)), "+", anyNum(&am.number2))(val)
 }
 
-func (am *assoziativMatcher2) Execute() value {
+func (am *associativeMatcher2) Execute() value {
 	return Add(am.v, Num(am.number1+am.number2))
 }
 
-type assoziativMatcher3 struct {
+type associativeMatcher3 struct {
 	number1, number2 float64
 	v                value
 }
 
-func (am *assoziativMatcher3) Match(val *value) bool {
+func (am *associativeMatcher3) Match(val *value) bool {
 	return bin(bin(anyNum(&am.number1), "+", any(&am.v)), "+", anyNum(&am.number2))(val)
 }
 
-func (am *assoziativMatcher3) Execute() value {
+func (am *associativeMatcher3) Execute() value {
 	return Add(Num(am.number1+am.number2), am.v)
 }
 
-type assoziativMatcher4 struct {
+type associativeMatcher4 struct {
 	number1, number2   float64
 	varName1, varName2 string
 	v                  value
 }
 
-func (am *assoziativMatcher4) Match(val *value) bool {
+func (am *associativeMatcher4) Match(val *value) bool {
 	return bin(bin(any(&am.v), "+", anyVariable(&am.number1, &am.varName1)), "+", anyVariable(&am.number2, &am.varName2))(val) && am.varName1 == am.varName2
 }
 
-func (am *assoziativMatcher4) Execute() value {
+func (am *associativeMatcher4) Execute() value {
 	return Add(am.v, Var(am.number1+am.number2, am.varName1))
 }
 
-type assoziativMatcher5 struct {
+type associativeMatcher5 struct {
 	number1, number2 float64
 	v                value
 }
 
-func (am *assoziativMatcher5) Match(val *value) bool {
+func (am *associativeMatcher5) Match(val *value) bool {
 	return bin(anyNum(&am.number1), "+", bin(any(&am.v), "+", anyNum(&am.number2)))(val)
 }
 
-func (am *assoziativMatcher5) Execute() value {
+func (am *associativeMatcher5) Execute() value {
 	return Add(am.v, Num(am.number1+am.number2))
 }
 
-type assoziativMatcher6 struct {
+type associativeMatcher6 struct {
 	number1, number2 float64
 	v                value
 }
 
-func (am *assoziativMatcher6) Match(val *value) bool {
+func (am *associativeMatcher6) Match(val *value) bool {
 	return bin(anyNum(&am.number1), "+", bin(anyNum(&am.number2), "+", any(&am.v)))(val)
 }
 
-func (am *assoziativMatcher6) Execute() value {
+func (am *associativeMatcher6) Execute() value {
 	return Add(am.v, Num(am.number1+am.number2))
 }
 
@@ -305,12 +293,12 @@ var Matchers = []PatternMatcher{
 	&returnValueMatcher{},
 	&variableMulMatcher{},
 	&variableAddMatcher{},
-	&variableAndNumberMulMatcher{},
-	&distributivMatcher{},
-	&assoziativMatcher1{},
-	&assoziativMatcher2{},
-	&assoziativMatcher3{},
-	&assoziativMatcher4{},
-	&assoziativMatcher5{},
-	&assoziativMatcher6{},
+	// &variableAndNumberMulMatcher{},
+	&distributiveMatcher{},
+	&associativeMatcher1{},
+	&associativeMatcher2{},
+	&associativeMatcher3{},
+	&associativeMatcher4{},
+	&associativeMatcher5{},
+	&associativeMatcher6{},
 }
