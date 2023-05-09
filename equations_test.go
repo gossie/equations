@@ -21,7 +21,8 @@ func TestSolveToR(t *testing.T) {
 	left := equations.Add(equations.Var(4, "r"), equations.Mul(equations.Num(0), equations.Num(7)))
 	right := equations.Add(equations.Var(1, "s"), equations.Div(equations.Num(25), equations.Num(5)))
 
-	r, _ := equations.NewEquation(left, right).SolveTo("r")
+	eq := equations.NewEquation(left, right)
+	r, _ := equations.SolveTo(&eq, "r")
 
 	if r.String() != "(0.250000s + 1.250000)" {
 		t.Fatalf("expected %v to be (0.250000s + 1.250000)", r)
@@ -33,7 +34,7 @@ func TestSolveToS(t *testing.T) {
 	right := equations.Add(equations.Var(1, "s"), equations.Div(equations.Num(25), equations.Num(5)))
 
 	original := equations.NewEquation(left, right)
-	s, _ := original.SolveTo("s")
+	s, _ := equations.SolveTo(&original, "s")
 
 	if s.String() != "(4.000000r + -5.000000)" {
 		t.Fatalf("expected %v to be (4.000000r + -5.000000)", s)
@@ -49,7 +50,7 @@ func TestSolveTo_variableOnBothSides(t *testing.T) {
 	right := equations.Add(equations.Var(2, "x"), equations.Div(equations.Num(25), equations.Num(5)))
 
 	original := equations.NewEquation(left, right)
-	s, _ := original.SolveTo("x")
+	s, _ := equations.SolveTo(&original, "x")
 
 	if s.String() != fmt.Sprintf("%f", -9.0/2.0) {
 		t.Fatalf("expected %v to be 4.5", s)
@@ -62,7 +63,8 @@ func TestSet(t *testing.T) {
 
 	r := equations.Div(equations.Add(equations.Var(1, "s"), equations.Num(5)), equations.Num(4))
 
-	eq := equations.NewEquation(left, right).Set("r", r)
+	eq := equations.NewEquation(left, right)
+	eq = equations.Set(&eq, "r", r)
 	if eq.String() != "((4.000000 * ((1.000000s + 5.000000) / 4.000000)) + (0.000000 * 7.000000)) = (1.000000s + (25.000000 / 5.000000))" {
 		t.Fatalf("expected %v to be ((4.000000 * ((1.000000s + 5.000000) / 4.000000)) + (0.000000 * 7.000000)) = (1.000000s + (25.000000 / 5.000000))", eq)
 	}

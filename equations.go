@@ -68,7 +68,7 @@ func findValue(val *value, name string) (*value, path, path, error) {
 
 type SolveError struct {
 	err           error
-	FinalEquation equation
+	FinalEquation *equation
 }
 
 func (se *SolveError) Error() string {
@@ -87,20 +87,20 @@ func (e equation) IsTrue() bool {
 	return e.left.execute() == e.right.execute()
 }
 
-func (e equation) optimize() equation {
-	l := e.left.execute()
-	r := e.right.execute()
+func optimize(eq *equation) equation {
+	l := eq.left.execute()
+	r := eq.right.execute()
 	return NewEquation(l, r)
 }
 
-func (eq equation) SolveTo(varName string) (*value, error) {
+func SolveTo(eq *equation, varName string) (*value, error) {
 	left, _, leftComplementaryPath, errLeft := findValue(&eq.left, varName)
 	right, rightPath, rightComplementaryPath, errRight := findValue(&eq.right, varName)
 
 	if left != nil && right != nil {
 		eq := NewEquation(processPathElement(rightPath[len(rightPath)-1], eq.left), processPathElement(rightPath[len(rightPath)-1], eq.right))
-		eq = eq.optimize()
-		return eq.SolveTo(varName)
+		eq = optimize(&eq)
+		return SolveTo(&eq, varName)
 	}
 
 	if errLeft != nil && errRight != nil {
@@ -114,7 +114,7 @@ func (eq equation) SolveTo(varName string) (*value, error) {
 	}
 }
 
-func (e equation) Set(varName string, val value) equation {
+func Set(e *equation, varName string, val value) equation {
 	newLeft := insert(e.left, varName, val)
 	newRight := insert(e.right, varName, val)
 	return NewEquation(newLeft, newRight)
