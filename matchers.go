@@ -1,6 +1,9 @@
 package equations
 
-import "math"
+import (
+	"math"
+	"reflect"
+)
 
 type pattern func(*value) bool
 
@@ -335,6 +338,20 @@ func (bm *binomial1Matcher) Execute() value {
 	return Add(Add(Pow(bm.val1, Num(2)), Mul(Num(2), Mul(bm.val1, bm.val2))), Pow(bm.val2, Num(2)))
 }
 
+type binomial3Matcher struct {
+	val1, val2, val3, val4 value
+	number1, number2       float64
+}
+
+func (bm *binomial3Matcher) Match(val *value) bool {
+	return bin(bin(any(&bm.val1), "+", any(&bm.val2)), "*", bin(any(&bm.val3), "-", any(&bm.val4)))(val) && reflect.DeepEqual(bm.val1, bm.val3) && reflect.DeepEqual(bm.val2, bm.val4) ||
+		bin(bin(any(&bm.val1), "+", anyNum(&bm.number1)), "*", bin(any(&bm.val3), "+", anyNum(&bm.number2)))(val) && reflect.DeepEqual(bm.val1, bm.val3) && math.Abs(bm.number1) == math.Abs(bm.number2) || bm.number1 > 0 && bm.number2 < 0
+}
+
+func (bm *binomial3Matcher) Execute() value {
+	return Sub(Pow(bm.val1, Num(2)), Pow(bm.val2, Num(2)))
+}
+
 var Matchers = []PatternMatcher{
 	&removeSubtractionMatcher{},
 	&removeVariableSubtractionMatcher{},
@@ -357,4 +374,6 @@ var Matchers = []PatternMatcher{
 	&associativeMatcher4{},
 	&associativeMatcher5{},
 	&associativeMatcher6{},
+	&binomial1Matcher{},
+	&binomial3Matcher{},
 }

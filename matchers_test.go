@@ -324,10 +324,10 @@ func TestVariableAddMatcher_2(t *testing.T) {
 }
 
 func TestDistributiveMatcher_1(t *testing.T) {
-	formular := Mul(Add(Num(2), Num(4)), Num(3))
+	formula := Mul(Add(Num(2), Num(4)), Num(3))
 
 	matcher := distributiveMatcher{}
-	if !matcher.Match(&formular) {
+	if !matcher.Match(&formula) {
 		t.Fatal("matcher should match")
 	}
 
@@ -339,10 +339,10 @@ func TestDistributiveMatcher_1(t *testing.T) {
 }
 
 func TestDistributiveMatcher_2(t *testing.T) {
-	formular := Mul(Num(3), Add(Num(2), Num(4)))
+	formula := Mul(Num(3), Add(Num(2), Num(4)))
 
 	matcher := distributiveMatcher{}
-	if !matcher.Match(&formular) {
+	if !matcher.Match(&formula) {
 		t.Fatal("matcher should match")
 	}
 
@@ -354,14 +354,29 @@ func TestDistributiveMatcher_2(t *testing.T) {
 }
 
 func TestBinomial1(t *testing.T) {
-	formular := Pow(Add(Var(2, "x", 1), Num(3)), Num(2))
+	formula := Pow(Add(Var(2, "x", 1), Num(3)), Num(2))
 
 	matcher := binomial1Matcher{}
-	if !matcher.Match(&formular) {
+	if !matcher.Match(&formula) {
 		t.Fatal("matcher should match")
 	}
 
 	expected := Add(Add(Pow(Var(2, "x", 1), Num(2)), Mul(Num(2), Mul(Var(2, "x", 1), Num(3)))), Pow(Num(3), Num(2)))
+	result := matcher.Execute()
+	if !reflect.DeepEqual(result, expected) {
+		t.Fatalf("expect %v to be %v", result, expected)
+	}
+}
+
+func TestBinomial3_1(t *testing.T) {
+	formula := Mul(Add(Var(2, "x", 1), Num(3)), Add(Var(2, "x", 1), Num(-3)))
+
+	matcher := binomial3Matcher{}
+	if !matcher.Match(&formula) {
+		t.Fatal("matcher should match")
+	}
+
+	expected := Sub(Pow(Var(2, "x", 1), Num(2)), Pow(Num(3), Num(2)))
 	result := matcher.Execute()
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("expect %v to be %v", result, expected)
