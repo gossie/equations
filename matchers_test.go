@@ -382,3 +382,18 @@ func TestBinomial3_1(t *testing.T) {
 		t.Fatalf("expect %v to be %v", result, expected)
 	}
 }
+
+func TestBinomial3_2(t *testing.T) {
+	formula := Mul(Add(Var(2, "x", 1), Var(1, "y", 1)), Sub(Var(2, "x", 1), Var(1, "y", 1)))
+
+	matcher := binomial3Matcher{}
+	if !matcher.Match(&formula) {
+		t.Fatal("matcher should match")
+	}
+
+	expected := Sub(Pow(Var(2, "x", 1), Num(2)), Pow(Var(1, "y", 1), Num(2)))
+	result := matcher.Execute()
+	if !reflect.DeepEqual(result, expected) {
+		t.Fatalf("expect %v to be %v", result, expected)
+	}
+}
