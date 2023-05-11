@@ -18,8 +18,8 @@ import (
 // }
 
 func TestSolveToR(t *testing.T) {
-	left := equations.Add(equations.Var(4, "r"), equations.Mul(equations.Num(0), equations.Num(7)))
-	right := equations.Add(equations.Var(1, "s"), equations.Div(equations.Num(25), equations.Num(5)))
+	left := equations.Add(equations.Var(4, "r", 1), equations.Mul(equations.Num(0), equations.Num(7)))
+	right := equations.Add(equations.Var(1, "s", 1), equations.Div(equations.Num(25), equations.Num(5)))
 
 	eq := equations.NewEquation(left, right)
 	r, _ := equations.SolveTo(&eq, "r")
@@ -30,8 +30,8 @@ func TestSolveToR(t *testing.T) {
 }
 
 func TestSolveToS(t *testing.T) {
-	left := equations.Add(equations.Var(4, "r"), equations.Mul(equations.Num(0), equations.Num(7)))
-	right := equations.Add(equations.Var(1, "s"), equations.Div(equations.Num(25), equations.Num(5)))
+	left := equations.Add(equations.Var(4, "r", 1), equations.Mul(equations.Num(0), equations.Num(7)))
+	right := equations.Add(equations.Var(1, "s", 1), equations.Div(equations.Num(25), equations.Num(5)))
 
 	original := equations.NewEquation(left, right)
 	s, _ := equations.SolveTo(&original, "s")
@@ -46,8 +46,8 @@ func TestSolveToS(t *testing.T) {
 }
 
 func TestSolveTo_variableOnBothSides(t *testing.T) {
-	left := equations.Add(equations.Var(4, "x"), equations.Mul(equations.Num(2), equations.Num(7)))
-	right := equations.Add(equations.Var(2, "x"), equations.Div(equations.Num(25), equations.Num(5)))
+	left := equations.Add(equations.Var(4, "x", 1), equations.Mul(equations.Num(2), equations.Num(7)))
+	right := equations.Add(equations.Var(2, "x", 1), equations.Div(equations.Num(25), equations.Num(5)))
 
 	original := equations.NewEquation(left, right)
 	s, _ := equations.SolveTo(&original, "x")
@@ -58,10 +58,10 @@ func TestSolveTo_variableOnBothSides(t *testing.T) {
 }
 
 func TestSet(t *testing.T) {
-	left := equations.Add(equations.Var(4, "r"), equations.Mul(equations.Num(0), equations.Num(7)))
-	right := equations.Add(equations.Var(1, "s"), equations.Div(equations.Num(25), equations.Num(5)))
+	left := equations.Add(equations.Var(4, "r", 1), equations.Mul(equations.Num(0), equations.Num(7)))
+	right := equations.Add(equations.Var(1, "s", 1), equations.Div(equations.Num(25), equations.Num(5)))
 
-	r := equations.Div(equations.Add(equations.Var(1, "s"), equations.Num(5)), equations.Num(4))
+	r := equations.Div(equations.Add(equations.Var(1, "s", 1), equations.Num(5)), equations.Num(4))
 
 	eq := equations.NewEquation(left, right)
 	eq = equations.Set(&eq, "r", r)

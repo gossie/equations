@@ -177,10 +177,10 @@ func (e equation) String() string {
 }
 
 type value struct {
-	left, right *value
-	op          string
-	number      float64
-	name        string
+	left, right      *value
+	op               string
+	number, exponent float64
+	name             string
 }
 
 func (v value) Number() float64 {
@@ -243,10 +243,14 @@ func Mul(left, right value) value {
 	return value{left: &left, right: &right, op: "*"}
 }
 
+func Pow(left, right value) value {
+	return value{left: &left, right: &right, op: "^"}
+}
+
 func Div(left, right value) value {
 	return value{left: &left, right: &right, op: "/"}
 }
 
-func Var(factor float64, name string) value {
-	return value{number: factor, name: name, op: "var"}
+func Var(factor float64, name string, exponent float64) value {
+	return value{number: factor, exponent: exponent, name: name, op: "var"}
 }
