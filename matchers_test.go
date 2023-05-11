@@ -352,3 +352,18 @@ func TestDistributiveMatcher_2(t *testing.T) {
 		t.Fatalf("expect %v to be %v", result, expected)
 	}
 }
+
+func TestBinomial1(t *testing.T) {
+	formular := Pow(Add(Var(2, "x", 1), Num(3)), Num(2))
+
+	matcher := binomial1Matcher{}
+	if !matcher.Match(&formular) {
+		t.Fatal("matcher should match")
+	}
+
+	expected := Add(Add(Pow(Var(2, "x", 1), Num(2)), Mul(Num(2), Mul(Var(2, "x", 1), Num(3)))), Pow(Num(3), Num(2)))
+	result := matcher.Execute()
+	if !reflect.DeepEqual(result, expected) {
+		t.Fatalf("expect %v to be %v", result, expected)
+	}
+}

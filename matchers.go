@@ -323,6 +323,18 @@ func (am *associativeMatcher6) Execute() value {
 	return Add(am.v, Num(am.number1+am.number2))
 }
 
+type binomial1Matcher struct {
+	val1, val2 value
+}
+
+func (bm *binomial1Matcher) Match(val *value) bool {
+	return bin(bin(any(&bm.val1), "+", any(&bm.val2)), "^", num(2))(val)
+}
+
+func (bm *binomial1Matcher) Execute() value {
+	return Add(Add(Pow(bm.val1, Num(2)), Mul(Num(2), Mul(bm.val1, bm.val2))), Pow(bm.val2, Num(2)))
+}
+
 var Matchers = []PatternMatcher{
 	&removeSubtractionMatcher{},
 	&removeVariableSubtractionMatcher{},
@@ -335,6 +347,7 @@ var Matchers = []PatternMatcher{
 	&returnOneMatcher{},
 	&returnValueMatcher{},
 	&variableMulMatcher{},
+	&variableMulVariableMatcher{},
 	&variableAddMatcher{},
 	// &variableAndNumberMulMatcher{},
 	&distributiveMatcher{},
